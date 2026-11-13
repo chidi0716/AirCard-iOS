@@ -308,3 +308,12 @@
 "🎉 Passcode theme applied! Lock your iPhone to see it." = "🎉 Passcode theme applied! Lock your iPhone to see it.";
 "🎉 Wallpapers applied successfully!" = "🎉 Wallpapers applied successfully!";
 "Failed to delete %@: %@" = "Failed to delete %@: %@";
+"Automatically Reload After Writing" = "Automatically Reload After Writing";
+"Save Wallpaper Log" = "Save Wallpaper Log";
+"Save the wallpaper log, then reload manually." = "Save the wallpaper log, then reload manually.";
+"Unable to save wallpaper log: %@" = "Unable to save wallpaper log: %@";
+"Archive Wallpaper IDs" = "Archive Wallpaper IDs";
+"Reimport this archive to see its wallpaper IDs." = "Reimport this archive to see its wallpaper IDs.";
+"No wallpaper IDs found in this archive." = "No wallpaper IDs found in this archive.";
+"Another imported archive uses the same wallpaper ID. iOS may display either wallpaper." = "Another imported archive uses the same wallpaper ID. iOS may display either wallpaper.";
+"Wallpaper processing finished. Check the system wallpaper gallery." = "Wallpaper processing finished. Check the system wallpaper gallery.";

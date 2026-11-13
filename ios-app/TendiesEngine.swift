@@ -163,6 +163,13 @@ public final class TendiesEngine {
             descriptorCount: descriptorCount,
             posterType: posterType,
             previewImageData: previewData,
+            descriptorIdentifiers: Set(foundDescriptors.compactMap { descriptor -> String? in
+                let url = descriptor.url.appendingPathComponent("com.apple.posterkit.provider.descriptor.identifier")
+                guard let data = try? FileHandle(forReadingFrom: url).read(upToCount: 1024),
+                      let text = String(data: data, encoding: .utf8) else { return nil }
+                let identifier = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                return identifier.isEmpty ? nil : identifier
+            }).sorted(),
             dateImported: Date(),
             isSelected: true
         )
@@ -386,7 +393,7 @@ public final class TendiesEngine {
         log("✅ PosterBoard preferences staged for reload")
 
         progress(1.0)
-        log("\n🎉 All wallpapers injected successfully! Open Lock Screen settings or long-press lockscreen to choose your new wallpaper.")
+        log(L10n.tr("Wallpaper processing finished. Check the system wallpaper gallery."))
     }
 
     // MARK: - Tree Writer Helper

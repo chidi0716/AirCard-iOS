@@ -308,3 +308,12 @@
 "🎉 Passcode theme applied! Lock your iPhone to see it." = "🎉 密碼主題已套用！鎖定 iPhone 查看效果。";
 "🎉 Wallpapers applied successfully!" = "🎉 桌布套用成功！";
 "Failed to delete %@: %@" = "無法刪除 %@：%@";
+"Automatically Reload After Writing" = "寫入後自動重新載入";
+"Save Wallpaper Log" = "儲存桌布記錄";
+"Save the wallpaper log, then reload manually." = "可以先儲存桌布記錄，再手動重新載入。";
+"Unable to save wallpaper log: %@" = "無法儲存桌布記錄：%@";
+"Archive Wallpaper IDs" = "套件中的桌布識別碼";
+"Reimport this archive to see its wallpaper IDs." = "重新匯入這個套件即可查看桌布識別碼。";
+"No wallpaper IDs found in this archive." = "這個套件中找不到桌布識別碼。";
+"Another imported archive uses the same wallpaper ID. iOS may display either wallpaper." = "另一個已匯入的套件使用相同的桌布識別碼。iOS 可能會顯示其中任一張桌布。";
+"Wallpaper processing finished. Check the system wallpaper gallery." = "桌布處理已結束，請到系統桌布圖庫確認結果。";

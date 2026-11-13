@@ -13,7 +13,9 @@ struct TendiesView: View {
     @EnvironmentObject var vm: AppViewModel
     @State private var showFilePicker = false
     @State private var selectedDetailItem: TendieItem? = nil
-    @State private var isNeoSpringing = false
+    @AppStorage("aircard.automaticallyReloadWallpapers") private var automaticallyReload = true
+    @State private var wallpaperLog: WallpaperLogDocument?
+    @State private var exportingWallpaperLog = false
 
     private var selectedCount: Int {
         vm.tendieItems.filter { $0.isSelected }.count
@@ -82,6 +84,7 @@ struct TendiesView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                    Toggle("Automatically Reload After Writing", isOn: $automaticallyReload)
                 }
 
                 // Section 3: Wallpapers Gallery
@@ -147,7 +150,7 @@ struct TendiesView: View {
                         } else {
                             Button {
                                 Task {
-                                    await vm.flashSelectedTendies()
+                                    await vm.flashSelectedTendies(automaticallyReload: automaticallyReload)
                                 }
                             } label: {
                                 HStack(spacing: 8) {
@@ -166,9 +169,7 @@ struct TendiesView: View {
                         }
 
                         Button(role: .destructive) {
-                            vm.isNeoSpringing = true
-                            isNeoSpringing = true
-                            RespringHelper.triggerNeoSpring()
+                            vm.respringDevice()
                         } label: {
                             HStack(spacing: 8) {
                                 Spacer()
@@ -182,10 +183,13 @@ struct TendiesView: View {
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
+                        .disabled(vm.tendiesFlashPhase == .running)
                     }
                     .listRowInsets(EdgeInsets(top: 12, leading: 14, bottom: 12, trailing: 14))
                 } footer: {
-                    Text("Flashing will automatically trigger NeoSpring to respring the device and apply your new wallpapers.")
+                    if !automaticallyReload {
+                        Text("Save the wallpaper log, then reload manually.")
+                    }
                 }
 
                 // Section 5: Flash Log (CompactLogView)
@@ -196,6 +200,13 @@ struct TendiesView: View {
                             lines: vm.tendiesFlashLog,
                             onClear: { vm.tendiesFlashLog.removeAll() }
                         )
+                        Button {
+                            wallpaperLog = WallpaperLogDocument(text: vm.tendiesFlashLog.joined(separator: "\n"))
+                            exportingWallpaperLog = true
+                        } label: {
+                            Label("Save Wallpaper Log", systemImage: "square.and.arrow.down")
+                        }
+                        .disabled(vm.tendiesFlashPhase == .running)
                     }
                 }
             }
@@ -222,11 +233,20 @@ struct TendiesView: View {
                 }
             }
             .sheet(item: $selectedDetailItem) { item in
-                TendieDetailSheet(item: item)
+                TendieDetailSheet(item: item, hasSharedIdentifiers: hasSharedIdentifiers(item))
+            }
+            .fileExporter(
+                isPresented: $exportingWallpaperLog,
+                document: wallpaperLog,
+                contentType: .plainText,
+                defaultFilename: "AirCard-Wallpapers"
+            ) { result in
+                if case .failure(let error) = result {
+                    vm.errorMessage = L10n.tr("Unable to save wallpaper log: %@", error.localizedDescription)
+                }
             }
             .onAppear {
                 vm.isNeoSpringing = false
-                isNeoSpringing = false
                 vm.showSuccessAlert = false
                 vm.successAlertMessage = ""
                 vm.scanDocumentsForTendies()
@@ -237,7 +257,7 @@ struct TendiesView: View {
                 }
             }
             .overlay {
-                if isNeoSpringing || vm.isNeoSpringing {
+                if vm.isNeoSpringing {
                     ZStack {
                         Color.black.ignoresSafeArea()
                         NeoSpringView()
@@ -247,6 +267,33 @@ struct TendiesView: View {
                 }
             }
         }
+    }
+
+    private func hasSharedIdentifiers(_ item: TendieItem) -> Bool {
+        let identifiers = Set(item.descriptorIdentifiers ?? [])
+        return vm.tendieItems.contains { other in
+            other.id != item.id && !identifiers.isDisjoint(with: other.descriptorIdentifiers ?? [])
+        }
+    }
+}
+
+private struct WallpaperLogDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.plainText] }
+    let text: String
+
+    init(text: String) {
+        self.text = text
+    }
+
+    init(configuration: ReadConfiguration) throws {
+        guard let data = configuration.file.regularFileContents else {
+            throw CocoaError(.fileReadCorruptFile)
+        }
+        text = String(decoding: data, as: UTF8.self)
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: Data(text.utf8))
     }
 }
 
@@ -285,7 +332,7 @@ struct TendieRowView: View {
                     .lineLimit(1)
 
                 HStack(spacing: 6) {
-                    Text(item.posterType.rawValue)
+                    Text(verbatim: L10n.tr(item.posterType.rawValue))
                         .font(.caption2.bold())
                         .foregroundColor(item.posterType.badgeColor)
 
@@ -329,6 +376,7 @@ struct TendieRowView: View {
 
 struct TendieDetailSheet: View {
     let item: TendieItem
+    let hasSharedIdentifiers: Bool
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -353,6 +401,21 @@ struct TendieDetailSheet: View {
                     detailRow(title: "Descriptors", value: "\(item.descriptorCount)")
                     detailRow(title: "Target Extension", value: item.posterType.extensionBundleId)
                     detailRow(title: "Format", value: item.isContainer ? "App Container" : "Descriptor Archive")
+                    if let identifiers = item.descriptorIdentifiers, !identifiers.isEmpty {
+                        LabeledContent("Archive Wallpaper IDs") {
+                            Text(verbatim: identifiers.joined(separator: "\n"))
+                                .multilineTextAlignment(.trailing)
+                                .textSelection(.enabled)
+                        }
+                    } else if item.descriptorIdentifiers == nil {
+                        Text("Reimport this archive to see its wallpaper IDs.")
+                    } else {
+                        Text("No wallpaper IDs found in this archive.")
+                    }
+                    if hasSharedIdentifiers {
+                        Text("Another imported archive uses the same wallpaper ID. iOS may display either wallpaper.")
+                            .foregroundStyle(.orange)
+                    }
                     if item.unsafeContainer {
                         detailRow(title: "Warning", value: "Contains SQLite database")
                     }

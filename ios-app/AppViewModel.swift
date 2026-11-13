@@ -1331,7 +1331,7 @@ final class AppViewModel: ObservableObject {
         }
     }
 
-    func flashSelectedTendies() async {
+    func flashSelectedTendies(automaticallyReload: Bool = true) async {
         let selected = tendieItems.filter { $0.isSelected }
         guard !selected.isEmpty else {
             errorMessage = L10n.tr("No wallpapers selected to flash.")
@@ -1379,12 +1379,12 @@ final class AppViewModel: ObservableObject {
             )
             tendiesFlashPhase = .done(ok: true)
             tendiesFlashProgress = 1.0
-            tendiesFlashLog.append(L10n.tr("🎉 Wallpapers applied successfully!"))
-            tendiesFlashLog.append(L10n.tr("⚡ Triggering NeoSpring respring..."))
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-                self?.isNeoSpringing = true
-                RespringHelper.triggerNeoSpring()
+            if automaticallyReload {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+                    self?.respringDevice()
+                }
+            } else {
+                tendiesFlashLog.append(L10n.tr("Save the wallpaper log, then reload manually."))
             }
         } catch {
             tendiesFlashLog.append(L10n.tr("❌ Error: %@", error.localizedDescription))

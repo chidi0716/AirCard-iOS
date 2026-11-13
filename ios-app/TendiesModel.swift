@@ -55,6 +55,7 @@ public struct TendieItem: Identifiable, Codable, Equatable {
     public var descriptorCount: Int
     public var posterType: TendiePosterType
     public var previewImageData: Data?
+    public var descriptorIdentifiers: [String]?
     public var dateImported: Date
     public var isSelected: Bool
 
@@ -68,6 +69,7 @@ public struct TendieItem: Identifiable, Codable, Equatable {
         descriptorCount: Int = 1,
         posterType: TendiePosterType = .collections,
         previewImageData: Data? = nil,
+        descriptorIdentifiers: [String]? = nil,
         dateImported: Date = Date(),
         isSelected: Bool = true
     ) {
@@ -80,6 +82,7 @@ public struct TendieItem: Identifiable, Codable, Equatable {
         self.descriptorCount = descriptorCount
         self.posterType = posterType
         self.previewImageData = previewImageData
+        self.descriptorIdentifiers = descriptorIdentifiers
         self.dateImported = dateImported
         self.isSelected = isSelected
     }
@@ -98,6 +101,7 @@ public struct TendieItem: Identifiable, Codable, Equatable {
         lhs.name == rhs.name &&
         lhs.isSelected == rhs.isSelected &&
         lhs.descriptorCount == rhs.descriptorCount &&
+        lhs.descriptorIdentifiers == rhs.descriptorIdentifiers &&
         lhs.previewImageData?.count == rhs.previewImageData?.count
     }
 }
