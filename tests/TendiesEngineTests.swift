@@ -103,6 +103,61 @@ final class TendiesEngineTests: XCTestCase {
         XCTAssertEqual(readDict?["identifier"] as? Int, 44444, "Wallpaper.plist identifier SHOULD be randomized when suggestionMetadata is absent")
     }
 
+    @MainActor
+    func testDeletedDocumentsWallpaperDoesNotReappear() throws {
+        try checkDocumentsWallpaperDeletion(legacyCopy: false)
+    }
+
+    @MainActor
+    func testDeletedLegacyDocumentsWallpaperDoesNotReappear() throws {
+        try checkDocumentsWallpaperDeletion(legacyCopy: true)
+    }
+
+    @MainActor
+    func testDeletingWallpaperPreservesDifferentArchiveWithSameName() throws {
+        try checkDocumentsWallpaperDeletion(legacyCopy: true, matchingContents: false)
+    }
+
+    @MainActor
+    private func checkDocumentsWallpaperDeletion(
+        legacyCopy: Bool,
+        matchingContents: Bool = true
+    ) throws {
+        let fileManager = FileManager.default
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let name = "\(UUID().uuidString).tendies"
+        let source = docs.appendingPathComponent(name)
+        let item = TendieItem(name: name, fileName: name, relativePath: name)
+        let stored = item.fileURL
+        let defaultsKey = "aircard.saved_tendies"
+        let savedItems = UserDefaults.standard.object(forKey: defaultsKey)
+        defer {
+            try? fileManager.removeItem(at: source)
+            try? fileManager.removeItem(at: stored)
+            UserDefaults.standard.set(savedItems, forKey: defaultsKey)
+        }
+
+        try Data([1]).write(to: source)
+        if legacyCopy {
+            try Data([matchingContents ? 1 : 2]).write(to: stored)
+        }
+        let viewModel = AppViewModel()
+        XCTAssertTrue(fileManager.fileExists(atPath: stored.path))
+        XCTAssertEqual(fileManager.fileExists(atPath: source.path), legacyCopy)
+
+        viewModel.tendieItems.append(item)
+        viewModel.deleteTendie(item: item)
+        XCTAssertFalse(fileManager.fileExists(atPath: stored.path))
+        XCTAssertFalse(viewModel.tendieItems.contains { $0.id == item.id })
+        XCTAssertEqual(fileManager.fileExists(atPath: source.path), !matchingContents)
+
+        viewModel.scanDocumentsForTendies()
+        XCTAssertEqual(fileManager.fileExists(atPath: stored.path), !matchingContents)
+        if !matchingContents {
+            XCTAssertEqual(try Data(contentsOf: stored), Data([1]))
+        }
+    }
+
     func testMercuryDescriptorsIgnoredNameFolder() throws {
         let tempDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
