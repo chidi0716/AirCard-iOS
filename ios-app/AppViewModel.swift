@@ -160,8 +160,13 @@ final class AppViewModel: ObservableObject {
         if let rootItems = try? FileManager.default.contentsOfDirectory(at: docs, includingPropertiesForKeys: nil) {
             for u in rootItems where u.pathExtension.lowercased() == "tendies" {
                 let target = tendiesDir.appendingPathComponent(u.lastPathComponent)
-                if u.path != target.path && !FileManager.default.fileExists(atPath: target.path) {
-                    try? FileManager.default.copyItem(at: u, to: target)
+                if !FileManager.default.fileExists(atPath: target.path) {
+                    do {
+                        try FileManager.default.moveItem(at: u, to: target)
+                    } catch {
+                        errorMessage = "Failed to import \(u.lastPathComponent): \(error.localizedDescription)"
+                        continue
+                    }
                 }
                 foundURLs.append(target)
             }
@@ -1275,7 +1280,22 @@ final class AppViewModel: ObservableObject {
     }
 
     func deleteTendie(item: TendieItem) {
-        try? FileManager.default.removeItem(at: item.fileURL)
+        let fileManager = FileManager.default
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let legacyOriginal = docs.appendingPathComponent(item.fileURL.lastPathComponent)
+        do {
+            // Older versions copied Documents imports. Keep any same-name file with different contents.
+            if (try? legacyOriginal.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true,
+               fileManager.contentsEqual(atPath: legacyOriginal.path, andPath: item.fileURL.path) {
+                try fileManager.removeItem(at: legacyOriginal)
+            }
+            if fileManager.fileExists(atPath: item.fileURL.path) {
+                try fileManager.removeItem(at: item.fileURL)
+            }
+        } catch {
+            errorMessage = "Failed to delete \(item.fileName): \(error.localizedDescription)"
+            return
+        }
         tendieItems.removeAll(where: { $0.id == item.id })
         saveTendieItems()
     }
