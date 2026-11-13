@@ -293,7 +293,7 @@
 "[%lld/%lld] Flashing card %@…" = "[%lld/%lld] 正在刷入卡片 %@…";
 "airlift (AirTraffic sync sandbox escape)" = "airlift（AirTraffic 同步沙盒逃逸）";
 "iLoader / Jitterbug / AltStore" = "iLoader / Jitterbug / AltStore";
-"iOS %lld · v1.3.2" = "iOS %lld · v1.3.2";
+"iOS %lld · v%@" = "iOS %lld · v%@";
 "iOS 27.2 beta 3 or newer detected: Apple patched the AirTraffic exploit on this version. Operations will likely fail." = "检测到 iOS 27.2 beta 3 或更新版本：苹果已在此版本封堵 AirTraffic 漏洞利用，操作很可能失败。";
 "idle" = "空闲";
 "• In iLoader: Settings › Export Pairing File › save to Files.\n• In Jitterbug: Export your <UDID>.mobiledevicepairing.\n• On PC/Mac: Run jitterbugpair or export from SideServer / AltServer, then AirDrop to your iPhone." = "• 在 iLoader 中：设置 › 导出配对文件 › 保存到文件。\n• 在 Jitterbug 中：导出你的 <UDID>.mobiledevicepairing。\n• 在电脑/Mac 上：运行 jitterbugpair，或从 SideServer / AltServer 导出，再隔空投送到 iPhone。";
@@ -307,3 +307,4 @@
 "🎉 %lld/%lld card(s) flashed! Force-close Wallet app to see changes." = "🎉 %lld/%lld 张卡片刷入完成！请强制关闭钱包 App 以查看变化。";
 "🎉 Passcode theme applied! Lock your iPhone to see it." = "🎉 密码主题已应用！锁定 iPhone 查看效果。";
 "🎉 Wallpapers applied successfully!" = "🎉 壁纸应用成功！";
+"Failed to delete %@: %@" = "无法删除 %@：%@";

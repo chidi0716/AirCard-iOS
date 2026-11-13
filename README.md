@@ -1,5 +1,7 @@
 # AirCard-iOS
 
+English · [繁體中文](README.zh-TW.md)
+
 <p align="center">
   <img src="ios-app/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="128" height="128" alt="AirCard-iOS Icon" style="border-radius: 28px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);" />
 </p>
@@ -35,6 +37,8 @@ The app communicates with internal system services over a local loopback tunnel 
 > **Do not update past iOS 27.2 beta 2:** Apple patched the AirTraffic sync exploit in iOS 27.2 beta 3. If you update past beta 2, file injection will no longer work.
 
 ## Features
+
+Use the globe menu on the Pairing tab to choose English, Simplified Chinese, Traditional Chinese, or the system language.
 
 ### Apple Wallet card skins
 - Writes custom card artwork to Passbook caches (`cardBackgroundCombined@3x.png`, `@2x.png`, and `cardBackgroundCombined.pdf` for transit cards like Suica).

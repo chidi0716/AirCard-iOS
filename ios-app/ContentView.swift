@@ -892,16 +892,15 @@ struct ContentView: View {
 
 /// In-app language choices shown in the Pairing tab navigation bar.
 private struct LanguageOption: Hashable {
-    /// "system" | "en" | "zh-Hans"
     let code: String
-    /// Localizable display name ("中文" stays as-is in every language).
     let name: String
 }
 
 private let languageOptions: [LanguageOption] = [
     LanguageOption(code: LanguageManager.systemCode, name: "Follow System"),
     LanguageOption(code: LanguageManager.englishCode, name: "English"),
-    LanguageOption(code: LanguageManager.chineseCode, name: "中文"),
+    LanguageOption(code: LanguageManager.chineseCode, name: "简体中文"),
+    LanguageOption(code: LanguageManager.traditionalChineseCode, name: "繁體中文"),
 ]
 
 struct PairingTab: View {
@@ -936,12 +935,14 @@ struct PairingTab: View {
                             Text("AirCard-iOS")
                                 .font(.title2.bold())
                             Spacer()
-                            Text("iOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion) · v1.3.2")
-                                .font(.caption.monospaced().bold())
-                                .padding(.horizontal, 8).padding(.vertical, 3)
-                                .background(Color.blue.opacity(0.12))
-                                .foregroundStyle(.blue)
-                                .clipShape(Capsule())
+                            if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
+                                Text("iOS \(ProcessInfo.processInfo.operatingSystemVersion.majorVersion) · v\(version)")
+                                    .font(.caption.monospaced().bold())
+                                    .padding(.horizontal, 8).padding(.vertical, 3)
+                                    .background(Color.blue.opacity(0.12))
+                                    .foregroundStyle(.blue)
+                                    .clipShape(Capsule())
+                            }
                         }
                         Text("Apply custom wallet card skins and passcode themes on-device. Supports iOS 18.0 – 27.2 beta 2 (iOS 27.2 beta 3+ patched).")
                             .font(.subheadline)
@@ -1231,7 +1232,7 @@ struct PairingTab: View {
                         HStack(spacing: 4) {
                             Image(systemName: "globe")
                                 .font(.caption)
-                            Text(verbatim: lang.isChinese ? "中文" : "EN")
+                            Text(verbatim: languageOptions.first { $0.code == lang.effectiveCode }?.name ?? "English")
                                 .font(.caption.bold())
                         }
                         .foregroundStyle(.blue)

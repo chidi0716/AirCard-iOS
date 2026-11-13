@@ -164,7 +164,7 @@ final class AppViewModel: ObservableObject {
                     do {
                         try FileManager.default.moveItem(at: u, to: target)
                     } catch {
-                        errorMessage = "Failed to import \(u.lastPathComponent): \(error.localizedDescription)"
+                        errorMessage = L10n.tr("Failed to import %@: %@", u.lastPathComponent, error.localizedDescription)
                         continue
                     }
                 }
@@ -1293,7 +1293,7 @@ final class AppViewModel: ObservableObject {
                 try fileManager.removeItem(at: item.fileURL)
             }
         } catch {
-            errorMessage = "Failed to delete \(item.fileName): \(error.localizedDescription)"
+            errorMessage = L10n.tr("Failed to delete %@: %@", item.fileName, error.localizedDescription)
             return
         }
         tendieItems.removeAll(where: { $0.id == item.id })

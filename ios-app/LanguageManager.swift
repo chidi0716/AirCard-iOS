@@ -2,9 +2,7 @@ import SwiftUI
 
 /// In-app UI language setting.
 ///
-/// - "system": follow the iPhone language (Chinese → 中文, everything else → English)
-/// - "en": force English
-/// - "zh-Hans": force Simplified Chinese
+/// Supports English, Simplified Chinese, Traditional Chinese, and the iPhone language.
 ///
 /// The choice persists in UserDefaults and applies to every page immediately:
 /// static `Text("…")` literals re-resolve through `.environment(\.locale, …)`,
@@ -15,9 +13,9 @@ final class LanguageManager: ObservableObject {
     static let systemCode = "system"
     static let englishCode = "en"
     static let chineseCode = "zh-Hans"
+    static let traditionalChineseCode = "zh-Hant"
     static let selectionKey = "aircard.language"
 
-    /// "system" | "en" | "zh-Hans".
     /// NOTE: @Published + manual UserDefaults sync, NOT @AppStorage —
     /// @AppStorage inside an ObservableObject doesn't reliably emit
     /// objectWillChange, so the UI would only pick up the new language
@@ -28,23 +26,26 @@ final class LanguageManager: ObservableObject {
         }
     }
 
-    /// Effective lookup code: "en" or "zh-Hans".
     var effectiveCode: String {
+        Self.resolveCode(selection: selection, preferredLanguage: Locale.preferredLanguages.first)
+    }
+
+    static func resolveCode(selection: String, preferredLanguage: String?) -> String {
         switch selection {
-        case Self.englishCode: return Self.englishCode
-        case Self.chineseCode: return Self.chineseCode
+        case englishCode, chineseCode, traditionalChineseCode:
+            return selection
         default:
-            let first = Locale.preferredLanguages.first ?? "en"
-            return first.hasPrefix("zh") ? Self.chineseCode : Self.englishCode
+            let language = Locale.Language(identifier: preferredLanguage ?? englishCode)
+            guard language.languageCode?.identifier == "zh" else { return englishCode }
+            return language.maximalIdentifier.split(separator: "-").contains("Hant")
+                ? traditionalChineseCode : chineseCode
         }
     }
 
     /// Locale pushed into the SwiftUI environment so `Text("…")` literals switch language live.
     var effectiveLocale: Locale {
-        Locale(identifier: effectiveCode == Self.chineseCode ? "zh_Hans" : "en")
+        Locale(identifier: effectiveCode)
     }
-
-    var isChinese: Bool { effectiveCode == Self.chineseCode }
 }
 
 /// Localized string lookup that honors the in-app language override

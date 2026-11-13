@@ -293,7 +293,7 @@
 "[%lld/%lld] Flashing card %@…" = "[%lld/%lld] Flashing card %@…";
 "airlift (AirTraffic sync sandbox escape)" = "airlift (AirTraffic sync sandbox escape)";
 "iLoader / Jitterbug / AltStore" = "iLoader / Jitterbug / AltStore";
-"iOS %lld · v1.3.2" = "iOS %lld · v1.3.2";
+"iOS %lld · v%@" = "iOS %lld · v%@";
 "iOS 27.2 beta 3 or newer detected: Apple patched the AirTraffic exploit on this version. Operations will likely fail." = "iOS 27.2 beta 3 or newer detected: Apple patched the AirTraffic exploit on this version. Operations will likely fail.";
 "idle" = "idle";
 "• In iLoader: Settings › Export Pairing File › save to Files.\n• In Jitterbug: Export your <UDID>.mobiledevicepairing.\n• On PC/Mac: Run jitterbugpair or export from SideServer / AltServer, then AirDrop to your iPhone." = "• In iLoader: Settings › Export Pairing File › save to Files.\n• In Jitterbug: Export your <UDID>.mobiledevicepairing.\n• On PC/Mac: Run jitterbugpair or export from SideServer / AltServer, then AirDrop to your iPhone.";
@@ -307,3 +307,4 @@
 "🎉 %lld/%lld card(s) flashed! Force-close Wallet app to see changes." = "🎉 %lld/%lld card(s) flashed! Force-close Wallet app to see changes.";
 "🎉 Passcode theme applied! Lock your iPhone to see it." = "🎉 Passcode theme applied! Lock your iPhone to see it.";
 "🎉 Wallpapers applied successfully!" = "🎉 Wallpapers applied successfully!";
+"Failed to delete %@: %@" = "Failed to delete %@: %@";

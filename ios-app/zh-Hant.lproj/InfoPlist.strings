@@ -1,0 +1,3 @@
+"NSLocalNetworkUsageDescription" = "AirCard-iOS 需要本機網路權限，才能探索配對服務並連線至裝置。";
+"NSPhotoLibraryUsageDescription" = "AirCard-iOS 需要取用照片的權限，才能套用自訂卡面與密碼主題。";
+"CFBundleDisplayName" = "AirCard-iOS";
